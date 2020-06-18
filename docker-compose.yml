@@ -1,0 +1,15 @@
+version: '3'
+services:
+  app:
+    container_name: app
+    build: .
+    image: mail2telegram/daemon:dev
+    restart: always
+    volumes:
+      - .:/app
+      - ./docker/app/conf/php/dev.ini:/usr/local/etc/php/conf.d/dev.ini
+      - ./docker/app/conf/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+    environment:
+      - PHAN_DISABLE_XDEBUG_WARN=1
+      - PHAN_ALLOW_XDEBUG=0
+      - PHP_IDE_CONFIG=serverName=app
