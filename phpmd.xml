@@ -24,7 +24,6 @@
                 <value>
                     \Dev\ErrorHandler,
                     \App\App,
-                    \App\Router,
                 </value>
             </property>
         </properties>

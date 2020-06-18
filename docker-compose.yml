@@ -5,6 +5,7 @@ services:
     build: .
     image: mail2telegram/daemon:dev
     restart: always
+#    entrypoint: ['php', 'index.php']
     volumes:
       - .:/app
       - ./docker/app/conf/php/dev.ini:/usr/local/etc/php/conf.d/dev.ini
