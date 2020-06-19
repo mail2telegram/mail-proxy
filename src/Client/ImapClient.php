@@ -30,7 +30,11 @@ class ImapClient
         $mailsIds = $mailbox->searchMailbox('UNSEEN');
         foreach ($mailsIds as $id) {
             $mail = $mailbox->getMail($id);
-            $tel->sendMessage($account['chatId'], $mail->textPlain);
+            // @todo добавить <To>, возможно еще какие-то заголовки
+            $msg = $mail->subject
+                . "\n\nFrom: {$mail->fromName} <{$mail->fromAddress}>"
+                . "\n\n{$mail->textPlain}";
+            $tel->sendMessage($account['chatId'], $msg);
             $debug = [
                 'id' => $mail->id,
                 'date' => $mail->date,
