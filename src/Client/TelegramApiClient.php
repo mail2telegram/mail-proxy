@@ -51,12 +51,12 @@ class TelegramApiClient
         }
 
         if (!isset($response['ok'])) {
-            $this->logger->error('Telegram:sendMessage: wrong response');
+            $this->logger->error('Telegram.sendMessage: wrong response');
             return false;
         }
 
         if ($response['ok'] !== true) {
-            $this->logger->error('Telegram:sendMessage: ' . ($response['description'] ?? 'no description'));
+            $this->logger->error('Telegram.sendMessage: ' . ($response['description'] ?? 'no description'));
         }
 
         return true;
