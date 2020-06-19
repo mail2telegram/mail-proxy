@@ -2,7 +2,7 @@
 
 namespace App;
 
-use PhpImap\Mailbox;
+use App\Client\ImapClient;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -53,31 +53,10 @@ final class Worker
         $this->logger->info('Worker finished');
     }
 
-    /**
-     * @throws \PhpImap\Exceptions\InvalidParameterException
-     */
     private function task(): void
     {
         $this->logger->info('Worker task started');
-
-        // @todo draft
-        $testMailBox = App::get('testMailBox');
-        $mailbox = new Mailbox($testMailBox['imapPath'], $testMailBox['login'], $testMailBox['pwd']);
-        $mailsIds = $mailbox->searchMailbox('UNSEEN');
-        foreach ($mailsIds as $id) {
-            $mail = $mailbox->getMail($id, false);
-            $debug = [
-                'id' => $mail->id,
-                'date' => $mail->date,
-                'fromName' => $mail->fromName,
-                'fromAddress' => $mail->fromAddress,
-                'subject' => $mail->subject,
-                'hasAttachments' => (int) $mail->hasAttachments(),
-                'textPlain' => $mail->textPlain,
-            ];
-            $this->logger->debug(print_r($debug, true));
-        }
-
+        (new ImapClient($this->logger))->draft();
         $this->logger->info('Worker task finished');
     }
 }
