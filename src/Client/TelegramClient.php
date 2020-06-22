@@ -31,11 +31,28 @@ class TelegramClient
             }
             return true;
         }
+        /** @noinspection JsonEncodingApiUsageInspection */
         $data = [
             'form_params' => [
                 'chat_id' => $chatId,
                 'text' => $text,
                 'disable_web_page_preview' => true,
+                'reply_markup' => json_encode(
+                    [
+                        'inline_keyboard' => [
+                            [
+                                [
+                                    'text' => 'Reply',
+                                    'callback_data' => 'Reply',
+                                ],
+                                [
+                                    'text' => 'Archive',
+                                    'callback_data' => 'Archive',
+                                ],
+                            ],
+                        ],
+                    ]
+                ),
             ],
         ];
         $result = $this->execute('sendMessage', $data);
