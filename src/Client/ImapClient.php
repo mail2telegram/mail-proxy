@@ -10,6 +10,12 @@ use PhpImap\IncomingMailAttachment;
 use PhpImap\Mailbox;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Class ImapClient
+ * @package App\Client
+ * @todo уйти от связанности с классом TelegramClient. Пусть ImapClient занимается чем-то одним,
+ * а именно получает почту из ящика. Отправлять её в телеграм должен кто-то другой (думаю что Worker).
+ */
 class ImapClient
 {
     public const MAX_FILE_SIZE = 10_485_760; // 10 MB

@@ -7,6 +7,13 @@ use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+/**
+ * Class TelegramClient
+ * @package App\Client
+ * @todo Объявить интерфейс ChatInterface с методами receiveMessage, sendMessage, sendDocument
+ * Реализовать интерфейс в классе TelegramClient, в зависимостях передавать интерфейс.
+ * Реализацию мы можем потом поменять (например взяв библиотеку или вообще другой чат), а интерфейс останется.
+ */
 class TelegramClient
 {
     public const BASE_URL = 'https://api.telegram.org/bot';
