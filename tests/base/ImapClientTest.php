@@ -1,27 +1,26 @@
 <?php
 
-/** @noinspection PhpIllegalPsrClassPathInspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpIllegalPsrClassPathInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
+use App\App;
 use Codeception\Test\Unit;
 use PhpImap\Mailbox;
 
-// https://stackoverflow.com/questions/32222250/connect-to-gmail-with-php-imap
-// https://github.com/barbushin/php-imap
-// https://www.php.net/manual/ru/ref.imap.php
-
-class MailTest extends Unit
+class ImapClientTest extends Unit
 {
     protected BaseTester $tester;
 
     public function testMailParse(): void
     {
-        $config = require './config.php';
-        $testMailBox = $config['testMailBox'];
-        $attachmentsDir = rtrim($config['attachmentsDir'], '/');
+        new App();
+
+        $attachmentsDir = rtrim(App::get('attachmentsDir'), '/');
         if (!is_dir($attachmentsDir)) {
             mkdir($attachmentsDir, 0777, true);
         }
 
+        $testMailBox = App::get('testMailBox');
         $mailbox = new Mailbox($testMailBox['imapPath'], $testMailBox['login'], $testMailBox['pwd']);
         static::assertInstanceOf(Mailbox::class, $mailbox);
 

@@ -9,12 +9,14 @@ use Throwable;
 final class Worker
 {
     private const MEMORY_LIMIT = 134_217_728; // 128MB
-    private const USLEEP = 2_000_000;
+    private const USLEEP = 1_000_000;
 
     private LoggerInterface $logger;
+    private ImapClient $imap;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, ImapClient $imap)
     {
+        $this->imap = $imap;
         $this->logger = $logger;
         $this->logger->info('Worker started');
         pcntl_signal(SIGTERM, [$this, 'signalHandler']);
@@ -56,7 +58,7 @@ final class Worker
     private function task(): void
     {
         $this->logger->info('Worker task started');
-        (new ImapClient($this->logger))->draft();
+        $this->imap->draft();
         $this->logger->info('Worker task finished');
     }
 }

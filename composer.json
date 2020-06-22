@@ -25,13 +25,14 @@
   },
   "require": {
     "php": "^7.4",
+    "ext-curl": "*",
+    "ext-fileinfo": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-pcntl": "*",
     "ext-zend-opcache": "*",
     "monolog/monolog": "^2.1",
-    "php-imap/php-imap": "^4.1",
-    "ext-curl": "*"
+    "php-imap/php-imap": "^4.1"
   },
   "require-dev": {
     "codeception/codeception": "^4.1",
