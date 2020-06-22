@@ -25,12 +25,11 @@
   },
   "require": {
     "php": "^7.4",
-    "ext-curl": "*",
-    "ext-fileinfo": "*",
     "ext-json": "*",
     "ext-mbstring": "*",
     "ext-pcntl": "*",
     "ext-zend-opcache": "*",
+    "guzzlehttp/guzzle": "^6.5",
     "monolog/monolog": "^2.1",
     "php-imap/php-imap": "^4.1"
   },

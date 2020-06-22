@@ -3,6 +3,7 @@
 namespace App;
 
 use App\Client\ImapClient;
+use App\Model\Account;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -37,6 +38,7 @@ final class Worker
 
     public function loop(): void
     {
+        $storage = new Storage();
         while (true) {
             if (defined('TERMINATED')) {
                 break;
@@ -47,7 +49,7 @@ final class Worker
             }
             usleep(self::USLEEP);
             try {
-                $this->task();
+                $this->task($storage->getAccount());
             } catch (Throwable $e) {
                 $this->logger->error((string) $e);
             }
@@ -55,10 +57,15 @@ final class Worker
         $this->logger->info('Worker finished');
     }
 
-    private function task(): void
+    private function task(Account $account): void
     {
         $this->logger->info('Worker task started');
-        $this->imap->draft();
+
+        $mailbox = $this->imap->getMailbox($account);
+        if ($mailbox) {
+            $this->imap->forwardMailsToTelegram($mailbox, $account->telegramChatId);
+        }
+
         $this->logger->info('Worker task finished');
     }
 }

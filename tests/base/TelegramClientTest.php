@@ -5,6 +5,7 @@
 
 use App\App;
 use App\Client\TelegramClient;
+use App\Storage;
 use Codeception\Test\Unit;
 
 class TelegramClientTest extends Unit
@@ -14,22 +15,33 @@ class TelegramClientTest extends Unit
     public function testSendMessage(): void
     {
         new App();
-        $testMailBox = App::get('testMailBox');
+        $account = (new Storage())->getAccount();
 
         /** @var \App\Client\TelegramClient $client */
         $client = App::get(TelegramClient::class);
-        $result = $client->sendMessage($testMailBox['chatId'], 'test');
+        $result = $client->sendMessage($account->telegramChatId, 'test');
+        static::assertTrue($result);
+    }
+
+    public function testSendMessageLong(): void
+    {
+        new App();
+        $account = (new Storage())->getAccount();
+
+        /** @var \App\Client\TelegramClient $client */
+        $client = App::get(TelegramClient::class);
+        $result = $client->sendMessage($account->telegramChatId, str_repeat('Тестовое сообщение ', 250));
         static::assertTrue($result);
     }
 
     public function testSendDocument(): void
     {
         new App();
-        $testMailBox = App::get('testMailBox');
+        $account = (new Storage())->getAccount();
 
         /** @var \App\Client\TelegramClient $client */
         $client = App::get(TelegramClient::class);
-        $result = $client->sendDocument($testMailBox['chatId'], '/app/tests/_data/111.txt');
+        $result = $client->sendDocument($account->telegramChatId, '111.txt', file_get_contents('/app/tests/_data/111.txt'));
         static::assertSame('111.txt', $result['file_name']);
     }
 }

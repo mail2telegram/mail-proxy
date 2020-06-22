@@ -22,6 +22,7 @@ final class ServiceManager implements ContainerInterface
                     LoggerInterface::class,
                 ],
                 LoggerInterface::class => static function () {
+                    /** @phan-suppress-next-line PhanTypeMismatchArgument */
                     return (new Logger('app'))->pushHandler(new StreamHandler(STDERR));
                 },
             ],

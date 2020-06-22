@@ -3,13 +3,14 @@
 namespace App\Client;
 
 use App\App;
-use CURLFile;
-use JsonException;
+use GuzzleHttp\Client;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class TelegramClient
 {
     public const BASE_URL = 'https://api.telegram.org/bot';
+    public const MAX_TEXT_LENGTH = 4096;
 
     protected LoggerInterface $logger;
 
@@ -20,56 +21,73 @@ class TelegramClient
 
     public function sendMessage(int $chatId, string $text): bool
     {
-        $result = $this->execute(
-            'sendMessage',
-            [
+        if (mb_strlen($text) >= static::MAX_TEXT_LENGTH) {
+            $chanks = static::explodeText($text);
+            foreach ($chanks as $t) {
+                $result = $this->sendMessage($chatId, $t);
+                if (!$result) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        $data = [
+            'form_params' => [
                 'chat_id' => $chatId,
                 'text' => $text,
                 'disable_web_page_preview' => true,
-            ]
-        );
+            ],
+        ];
+        $result = $this->execute('sendMessage', $data);
         return (bool) $result;
     }
 
-    public function sendDocument(int $chatId, string $filePath): array
+    public function sendDocument(int $chatId, string $filename, string $contents): array
     {
-        $result = $this->execute(
-            'sendDocument',
-            [
-                'chat_id' => $chatId,
-                'document' => new CURLFile($filePath),
-                'disable_web_page_preview' => true,
-                'disable_notification' => true,
-            ]
-        );
+        $data = [
+            'multipart' => [
+                [
+                    'name' => 'chat_id',
+                    'contents' => $chatId,
+                ],
+                [
+                    'name' => 'disable_web_page_preview',
+                    'contents' => true,
+                ],
+                [
+                    'name' => 'disable_notification',
+                    'contents' => true,
+                ],
+                [
+                    'name' => 'document',
+                    'filename' => $filename,
+                    'contents' => $contents,
+                ],
+            ],
+        ];
+        $result = $this->execute('sendDocument', $data);
         return $result['document'] ?? [];
     }
 
     protected function execute(string $method, array $data): array
     {
-        $ch = curl_init();
-        curl_setopt_array(
-            $ch,
+        $client = new Client(
             [
-                CURLOPT_URL => 'https://api.telegram.org/bot' . App::get('telegramToken') . '/' . $method,
-                CURLOPT_POST => true,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 10,
-                CURLOPT_POSTFIELDS => $data,
+                'base_uri' => static::BASE_URL . App::get('telegramToken') . '/',
+                'timeout' => 10.0,
             ]
         );
-        $result = curl_exec($ch);
-        $error = curl_error($ch);
-        curl_close($ch);
 
-        if ($error) {
-            $this->logger->error('Telegram: ' . $error);
+        try {
+            $response = $client->request('POST', $method, $data);
+        } catch (Throwable $e) {
+            $this->logger->error('Telegram: ' . $e);
             return [];
         }
 
         try {
-            $response = json_decode($result, true, 512, JSON_THROW_ON_ERROR);
-        } catch (JsonException $e) {
+            $response = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+        } catch (Throwable $e) {
             $this->logger->error('Telegram: json decode error');
             return [];
         }
@@ -85,5 +103,63 @@ class TelegramClient
         }
 
         return $response['result'];
+    }
+
+    /**
+     * @param string $string
+     * @return array
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    public static function explodeText(string $string): array
+    {
+        $break = '<-B-R-E-A-K->';
+        $width = static::MAX_TEXT_LENGTH;
+
+        if (strlen($string) === mb_strlen($string)) {
+            return explode($break, wordwrap($string, $width, $break));
+        }
+
+        $stringWidth = mb_strlen($string);
+        $breakWidth = mb_strlen($break);
+
+        $result = '';
+        $lastStart = $lastSpace = 0;
+
+        for ($current = 0; $current < $stringWidth; $current++) {
+            $char = mb_substr($string, $current, 1);
+
+            $possibleBreak = $char;
+            if ($breakWidth !== 1) {
+                $possibleBreak = mb_substr($string, $current, $breakWidth);
+            }
+
+            if ($possibleBreak === $break) {
+                $result .= mb_substr($string, $lastStart, $current - $lastStart + $breakWidth);
+                $current += $breakWidth - 1;
+                $lastStart = $lastSpace = $current + 1;
+                continue;
+            }
+
+            if ($char === ' ') {
+                if ($current - $lastStart >= $width) {
+                    $result .= mb_substr($string, $lastStart, $current - $lastStart) . $break;
+                    $lastStart = $current + 1;
+                }
+                $lastSpace = $current;
+                continue;
+            }
+
+            if ($current - $lastStart >= $width && $lastStart < $lastSpace) {
+                $result .= mb_substr($string, $lastStart, $lastSpace - $lastStart) . $break;
+                $lastStart = ++$lastSpace;
+                continue;
+            }
+        }
+
+        if ($lastStart !== $current) {
+            $result .= mb_substr($string, $lastStart, $current - $lastStart);
+        }
+
+        return explode($break, $result);
     }
 }
