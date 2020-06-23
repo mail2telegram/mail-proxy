@@ -2,6 +2,8 @@
 
 namespace App\Service;
 
+use App\Storage;
+use App\StorageInterface;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
@@ -24,6 +26,9 @@ final class ServiceManager implements ContainerInterface
                 LoggerInterface::class => static function () {
                     /** @phan-suppress-next-line PhanTypeMismatchArgument */
                     return (new Logger('app'))->pushHandler(new StreamHandler(STDERR));
+                },
+                StorageInterface::class => static function () {
+                    return new Storage();
                 },
             ],
             require __DIR__ . '/../../config.php',

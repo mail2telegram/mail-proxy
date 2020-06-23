@@ -4,13 +4,15 @@ namespace App\Client;
 
 use App\App;
 use GuzzleHttp\Client;
+use PhpImap\IncomingMail;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
 class TelegramClient
 {
-    public const BASE_URL = 'https://api.telegram.org/bot';
-    public const MAX_TEXT_LENGTH = 4096;
+    protected const BASE_URL = 'https://api.telegram.org/bot';
+    protected const MAX_TEXT_LENGTH = 4096;
+    protected const MAX_FILE_SIZE = 10_485_760; // 10 MB
 
     protected LoggerInterface $logger;
 
@@ -59,8 +61,19 @@ class TelegramClient
         return (bool) $result;
     }
 
-    public function sendDocument(int $chatId, string $filename, string $contents): array
+    /**
+     * @param int    $chatId
+     * @param string $filename
+     * @param int    $size size int bytes
+     * @param string $contents
+     * @return bool
+     */
+    public function sendDocument(int $chatId, string $filename, int $size, string $contents): bool
     {
+        if ($size >= static::MAX_FILE_SIZE) {
+            $msg = "File '{$filename}' too big";
+            return $this->sendMessage($chatId, $msg);
+        }
         $data = [
             'multipart' => [
                 [
@@ -83,7 +96,7 @@ class TelegramClient
             ],
         ];
         $result = $this->execute('sendDocument', $data);
-        return $result['document'] ?? [];
+        return isset($result['document']);
     }
 
     protected function execute(string $method, array $data): array
@@ -178,5 +191,14 @@ class TelegramClient
         }
 
         return explode($break, $result);
+    }
+
+    public function formatMail(IncomingMail $mail): string
+    {
+        return $mail->subject
+            . "\n\nDate: {$mail->date}"
+            . "\nTo: {$mail->toString}"
+            . "\nFrom: {$mail->fromName} <{$mail->fromAddress}>"
+            . "\n\n{$mail->textPlain}";
     }
 }

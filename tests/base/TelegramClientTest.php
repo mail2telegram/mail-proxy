@@ -41,7 +41,8 @@ class TelegramClientTest extends Unit
 
         /** @var \App\Client\TelegramClient $client */
         $client = App::get(TelegramClient::class);
-        $result = $client->sendDocument($account->telegramChatId, '111.txt', file_get_contents('/app/tests/_data/111.txt'));
-        static::assertSame('111.txt', $result['file_name']);
+        $filepath = '/app/tests/_data/111.txt';
+        $result = $client->sendDocument($account->telegramChatId, '111.txt', filesize($filepath), file_get_contents($filepath));
+        static::assertTrue($result);
     }
 }

@@ -3,7 +3,7 @@
 namespace App;
 
 use App\Client\ImapClient;
-use App\Model\Account;
+use App\Client\TelegramClient;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -13,12 +13,17 @@ final class Worker
     private const USLEEP = 1_000_000;
 
     private LoggerInterface $logger;
+    private StorageInterface $storage;
     private ImapClient $imap;
+    private TelegramClient $telegram;
 
-    public function __construct(LoggerInterface $logger, ImapClient $imap)
+    public function __construct(LoggerInterface $logger, StorageInterface $storage, ImapClient $imap, TelegramClient $telegram)
     {
-        $this->imap = $imap;
         $this->logger = $logger;
+        $this->storage = $storage;
+        $this->imap = $imap;
+        $this->telegram = $telegram;
+
         $this->logger->info('Worker started');
         pcntl_signal(SIGTERM, [$this, 'signalHandler']);
         pcntl_signal(SIGINT, [$this, 'signalHandler']);
@@ -38,7 +43,6 @@ final class Worker
 
     public function loop(): void
     {
-        $storage = new Storage();
         while (true) {
             if (defined('TERMINATED')) {
                 break;
@@ -49,7 +53,9 @@ final class Worker
             }
             usleep(self::USLEEP);
             try {
-                $this->task($storage->getAccount());
+                $this->logger->info('Worker task started');
+                $this->task();
+                $this->logger->info('Worker task finished');
             } catch (Throwable $e) {
                 $this->logger->error((string) $e);
             }
@@ -57,15 +63,26 @@ final class Worker
         $this->logger->info('Worker finished');
     }
 
-    private function task(Account $account): void
+    private function task(): void
     {
-        $this->logger->info('Worker task started');
-
+        $account = $this->storage->getAccount();
         $mailbox = $this->imap->getMailbox($account);
-        if ($mailbox) {
-            $this->imap->forwardMailsToTelegram($mailbox, $account->telegramChatId);
+        if (!$mailbox) {
+            return;
         }
-
-        $this->logger->info('Worker task finished');
+        $mailsIds = $this->imap->getMails($mailbox);
+        foreach ($mailsIds as $id) {
+            $mail = $mailbox->getMail($id);
+            $this->telegram->sendMessage($account->telegramChatId, $this->telegram->formatMail($mail));
+            if (App::get('env') !== 'prod') {
+                $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
+            }
+            if ($mail->hasAttachments()) {
+                $attachments = $mail->getAttachments();
+                foreach ($attachments as $attach) {
+                    $this->telegram->sendDocument($account->telegramChatId, $attach->name, $attach->sizeInBytes, $attach->getContents());
+                }
+            }
+        }
     }
 }
