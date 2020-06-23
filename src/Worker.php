@@ -17,8 +17,12 @@ final class Worker
     private ImapClient $imap;
     private TelegramClient $telegram;
 
-    public function __construct(LoggerInterface $logger, StorageInterface $storage, ImapClient $imap, TelegramClient $telegram)
-    {
+    public function __construct(
+        LoggerInterface $logger,
+        StorageInterface $storage,
+        ImapClient $imap,
+        TelegramClient $telegram
+    ) {
         $this->logger = $logger;
         $this->storage = $storage;
         $this->imap = $imap;
@@ -80,7 +84,12 @@ final class Worker
             if ($mail->hasAttachments()) {
                 $attachments = $mail->getAttachments();
                 foreach ($attachments as $attach) {
-                    $this->telegram->sendDocument($account->telegramChatId, $attach->name, $attach->sizeInBytes, $attach->getContents());
+                    $this->telegram->sendDocument(
+                        $account->telegramChatId,
+                        $attach->name,
+                        $attach->sizeInBytes,
+                        $attach->getContents()
+                    );
                 }
             }
         }
