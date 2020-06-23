@@ -1,7 +1,7 @@
 version: '3'
 services:
-  app:
-    container_name: app
+  m2td:
+    container_name: m2td
     build: .
     image: mail2telegram/daemon:dev
     restart: always
