@@ -1,1 +1,1 @@
-![Test](https://github.com/mail2telegram/daemon/workflows/Test/badge.svg)
+![Test](https://github.com/mail2telegram/mail-proxy/workflows/Test/badge.svg)

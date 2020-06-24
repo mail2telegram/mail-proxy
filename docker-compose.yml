@@ -1,11 +1,11 @@
 version: '3'
 services:
-  m2td:
-    container_name: m2td
+  m2t_mail:
+    container_name: m2t_mail
     build: .
-    image: mail2telegram/daemon:dev
+    image: mail2telegram/mail-proxy:dev
     restart: always
-#    entrypoint: ['php', 'index.php']
+    entrypoint: ["tail", "-f", "/dev/null"]
     volumes:
       - .:/app
       - ./docker/app/conf/php/dev.ini:/usr/local/etc/php/conf.d/dev.ini

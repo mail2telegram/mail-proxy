@@ -77,7 +77,11 @@ final class Worker
         $mailsIds = $this->imap->getMails($mailbox);
         foreach ($mailsIds as $id) {
             $mail = $mailbox->getMail($id);
-            $this->telegram->sendMessage($account->telegramChatId, $this->telegram->formatMail($mail));
+            $this->telegram->sendMessage(
+                $account->telegramChatId,
+                $this->telegram->formatMail($mail),
+                $this->getReplyMarkup()
+            );
             if (App::get('env') !== 'prod') {
                 $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
             }
@@ -93,5 +97,27 @@ final class Worker
                 }
             }
         }
+    }
+
+    // @todo dratf
+    private function getReplyMarkup(): string
+    {
+        /** @noinspection JsonEncodingApiUsageInspection */
+        return json_encode(
+            [
+                'inline_keyboard' => [
+                    [
+                        [
+                            'text' => 'Reply',
+                            'callback_data' => 'Reply',
+                        ],
+                        [
+                            'text' => 'Archive',
+                            'callback_data' => 'Archive',
+                        ],
+                    ],
+                ],
+            ]
+        );
     }
 }
