@@ -23,16 +23,4 @@ class ImapClientTest extends Unit
         $mailbox = $client->getMailbox($account);
         static::assertInstanceOf(Mailbox::class, $mailbox);
     }
-
-    public function forwardMailsToTelegram(): void
-    {
-        new App();
-        $account = (new Storage())->getAccount();
-
-        /** @var ImapClient $client */
-        $client = App::get(ImapClient::class);
-        $mailbox = $client->getMailbox($account);
-
-        $client->forwardMailsToTelegram($mailbox, $account->telegramChatId);
-    }
 }

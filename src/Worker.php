@@ -9,13 +9,12 @@ use Throwable;
 
 final class Worker
 {
-    private const MEMORY_LIMIT = 134_217_728; // 128MB
-    private const USLEEP = 1_000_000;
-
     private LoggerInterface $logger;
     private StorageInterface $storage;
     private ImapClient $imap;
     private TelegramClient $telegram;
+    private int $memoryLimit;
+    private int $interval;
 
     public function __construct(
         LoggerInterface $logger,
@@ -27,6 +26,8 @@ final class Worker
         $this->storage = $storage;
         $this->imap = $imap;
         $this->telegram = $telegram;
+        $this->interval = App::get('workerInterval');
+        $this->memoryLimit = App::get('workerMemoryLimit');
 
         $this->logger->info('Worker started');
         pcntl_signal(SIGTERM, [$this, 'signalHandler']);
@@ -51,11 +52,11 @@ final class Worker
             if (defined('TERMINATED')) {
                 break;
             }
-            if (memory_get_usage(true) >= self::MEMORY_LIMIT) {
+            if (memory_get_usage(true) >= $this->memoryLimit) {
                 $this->logger->warning('Worker out of memory');
                 break;
             }
-            usleep(self::USLEEP);
+            usleep($this->interval);
             try {
                 $this->logger->info('Worker task started');
                 $this->task();
@@ -82,9 +83,7 @@ final class Worker
                 $this->telegram->formatMail($mail),
                 $this->getReplyMarkup()
             );
-            if (App::get('env') !== 'prod') {
-                $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
-            }
+            $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
             if ($mail->hasAttachments()) {
                 $attachments = $mail->getAttachments();
                 foreach ($attachments as $attach) {

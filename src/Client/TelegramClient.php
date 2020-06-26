@@ -15,10 +15,17 @@ class TelegramClient
     protected const MAX_FILE_SIZE = 10_485_760; // 10 MB
 
     protected LoggerInterface $logger;
+    protected Client $client;
 
     public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
+        $this->client = new Client(
+            [
+                'base_uri' => static::BASE_URL . App::get('telegramToken') . '/',
+                'timeout' => 5.0,
+            ]
+        );
     }
 
     public function sendMessage(int $chatId, string $text, string $replyMarkup = ''): bool
@@ -88,15 +95,8 @@ class TelegramClient
 
     protected function execute(string $method, array $data): array
     {
-        $client = new Client(
-            [
-                'base_uri' => static::BASE_URL . App::get('telegramToken') . '/',
-                'timeout' => 10.0,
-            ]
-        );
-
         try {
-            $response = $client->request('POST', $method, $data);
+            $response = $this->client->request('POST', $method, $data);
         } catch (Throwable $e) {
             $this->logger->error('Telegram: ' . $e);
             return [];

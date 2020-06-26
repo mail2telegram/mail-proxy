@@ -31,6 +31,7 @@
     "ext-zend-opcache": "*",
     "guzzlehttp/guzzle": "^6.5",
     "monolog/monolog": "^2.1",
+    "pahanini/monolog-cli-formatter": "^1.0",
     "php-imap/php-imap": "^4.1"
   },
   "require-dev": {
