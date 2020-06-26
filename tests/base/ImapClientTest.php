@@ -3,7 +3,7 @@
 /** @noinspection PhpIllegalPsrClassPathInspection */
 /** @noinspection PhpUnhandledExceptionInspection */
 
-use App\App;
+use M2T\App;
 use App\Client\ImapClient;
 use App\Storage;
 use Codeception\Test\Unit;

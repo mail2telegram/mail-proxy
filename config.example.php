@@ -1,8 +1,8 @@
 <?php
 
-use App\App;
 use App\Storage;
 use App\StorageInterface;
+use M2T\App;
 use M2T\Model\Account;
 use M2T\Model\Email;
 use Monolog\Handler\StreamHandler;

@@ -2,6 +2,7 @@
 
 namespace App;
 
+use M2T\App;
 use App\Client\ImapClient;
 use App\Client\TelegramClient;
 use Psr\Log\LoggerInterface;
