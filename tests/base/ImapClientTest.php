@@ -4,8 +4,8 @@
 /** @noinspection PhpUnhandledExceptionInspection */
 
 use M2T\App;
-use App\Client\ImapClient;
-use App\Storage;
+use M2T\Client\ImapClient;
+use M2T\Storage;
 use Codeception\Test\Unit;
 use PhpImap\Mailbox;
 

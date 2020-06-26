@@ -1,8 +1,7 @@
 <?php
 
-namespace App;
+namespace M2T;
 
-use M2T\App;
 use M2T\Model\Account;
 use ArrayIterator;
 
