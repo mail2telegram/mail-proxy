@@ -71,28 +71,30 @@ final class Worker
     private function task(): void
     {
         $account = $this->storage->getAccount();
-        $mailbox = $this->imap->getMailbox($account);
-        if (!$mailbox) {
-            return;
-        }
-        $mailsIds = $this->imap->getMails($mailbox);
-        foreach ($mailsIds as $id) {
-            $mail = $mailbox->getMail($id);
-            $this->telegram->sendMessage(
-                $account->telegramChatId,
-                $this->telegram->formatMail($mail),
-                $this->getReplyMarkup()
-            );
-            $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
-            if ($mail->hasAttachments()) {
-                $attachments = $mail->getAttachments();
-                foreach ($attachments as $attach) {
-                    $this->telegram->sendDocument(
-                        $account->telegramChatId,
-                        $attach->name,
-                        $attach->sizeInBytes,
-                        $attach->getContents()
-                    );
+        foreach ($account->emails as $email) {
+            $mailbox = $this->imap->getMailbox($email);
+            if (!$mailbox) {
+                continue;
+            }
+            $mailsIds = $this->imap->getMails($mailbox);
+            foreach ($mailsIds as $id) {
+                $mail = $mailbox->getMail($id);
+                $this->telegram->sendMessage(
+                    $account->chatId,
+                    $this->telegram->formatMail($mail),
+                    $this->getReplyMarkup()
+                );
+                $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
+                if ($mail->hasAttachments()) {
+                    $attachments = $mail->getAttachments();
+                    foreach ($attachments as $attach) {
+                        $this->telegram->sendDocument(
+                            $account->chatId,
+                            $attach->name,
+                            $attach->sizeInBytes,
+                            $attach->getContents()
+                        );
+                    }
                 }
             }
         }

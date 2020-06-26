@@ -2,7 +2,7 @@
 
 namespace App;
 
-use App\Model\Account;
+use M2T\Model\Account;
 use ArrayIterator;
 
 class Storage implements StorageInterface

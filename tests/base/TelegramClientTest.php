@@ -19,7 +19,7 @@ class TelegramClientTest extends Unit
 
         /** @var \App\Client\TelegramClient $client */
         $client = App::get(TelegramClient::class);
-        $result = $client->sendMessage($account->telegramChatId, 'test');
+        $result = $client->sendMessage($account->chatId, 'test');
         static::assertTrue($result);
     }
 
@@ -30,7 +30,7 @@ class TelegramClientTest extends Unit
 
         /** @var \App\Client\TelegramClient $client */
         $client = App::get(TelegramClient::class);
-        $result = $client->sendMessage($account->telegramChatId, str_repeat('Тестовое сообщение ', 250));
+        $result = $client->sendMessage($account->chatId, str_repeat('Тестовое сообщение ', 250));
         static::assertTrue($result);
     }
 
@@ -42,7 +42,7 @@ class TelegramClientTest extends Unit
         /** @var \App\Client\TelegramClient $client */
         $client = App::get(TelegramClient::class);
         $filepath = '/app/tests/_data/111.txt';
-        $result = $client->sendDocument($account->telegramChatId, '111.txt', filesize($filepath), file_get_contents($filepath));
+        $result = $client->sendDocument($account->chatId, '111.txt', filesize($filepath), file_get_contents($filepath));
         static::assertTrue($result);
     }
 }

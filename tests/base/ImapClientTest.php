@@ -17,10 +17,11 @@ class ImapClientTest extends Unit
     {
         new App();
         $account = (new Storage())->getAccount();
+        $email = $account->emails[0];
 
         /** @var ImapClient $client */
         $client = App::get(ImapClient::class);
-        $mailbox = $client->getMailbox($account);
+        $mailbox = $client->getMailbox($email);
         static::assertInstanceOf(Mailbox::class, $mailbox);
     }
 }

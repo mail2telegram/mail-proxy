@@ -2,7 +2,7 @@
 
 namespace App\Client;
 
-use App\Model\Account;
+use M2T\Model\Email;
 use PhpImap\Exceptions\InvalidParameterException;
 use PhpImap\Mailbox;
 use Psr\Log\LoggerInterface;
@@ -16,7 +16,7 @@ class ImapClient
         $this->logger = $logger;
     }
 
-    public function getMailbox(Account $account): ?Mailbox
+    public function getMailbox(Email $account): ?Mailbox
     {
         try {
             return new Mailbox(
