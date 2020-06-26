@@ -19,7 +19,11 @@ class ImapClient
     public function getMailbox(Account $account): ?Mailbox
     {
         try {
-            return new Mailbox($account->imapPath, $account->imapLogin, $account->imapPassword);
+            return new Mailbox(
+                "{{$account->imapHost}:{$account->imapPort}/imap/{$account->imapSocketType}}INBOX",
+                $account->email,
+                $account->pwd
+            );
         } catch (InvalidParameterException $e) {
             $this->logger->error((string) $e);
         }

@@ -12,7 +12,17 @@ return [
     'telegramToken' => 'XXX',
     'test' => [
         'accounts' => [
-            new Account('{imap.gmail.com:993/imap/ssl}INBOX', 'mail2telegram.app@gmail.com', 'XXX', 123456),
+            new Account(
+                'mail2telegram.app@gmail.com',
+                'XXX',
+                123456,
+                'imap.gmail.com',
+                993,
+                'ssl',
+                'smtp.gmail.com',
+                465,
+                'ssl'
+            ),
         ],
     ],
     LoggerInterface::class => static function () {
