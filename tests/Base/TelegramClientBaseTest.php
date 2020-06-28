@@ -1,13 +1,15 @@
 <?php
 
-/** @noinspection PhpIllegalPsrClassPathInspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpUnhandledExceptionInspection */
 
+namespace Base;
+
+use BaseTester;
+use Codeception\Test\Unit;
 use M2T\App;
 use M2T\Client\TelegramClient;
-use Codeception\Test\Unit;
-use Monolog\Logger;
 
-class TelegramClientTest extends Unit
+class TelegramClientBaseTest extends Unit
 {
     protected BaseTester $tester;
     protected int $chatId;
@@ -16,9 +18,8 @@ class TelegramClientTest extends Unit
     public function __construct()
     {
         parent::__construct();
-        new App();
-        $this->chatId = App::get('test')['chatId'];
-        $this->client = new TelegramClient(new Logger('test'));
+        $this->chatId = getenv('TEST_CHAT_ID') ?: App::get('TEST_CHAT_ID');
+        $this->client = App::get(TelegramClient::class);
     }
 
     public function testSendMessage(): void
@@ -62,7 +63,12 @@ class TelegramClientTest extends Unit
     public function testSendDocument(): void
     {
         $filepath = '/app/tests/_data/111.txt';
-        $result = $this->client->sendDocument($this->chatId, '111.txt', filesize($filepath), file_get_contents($filepath));
+        $result = $this->client->sendDocument(
+            $this->chatId,
+            '111.txt',
+            filesize($filepath),
+            file_get_contents($filepath)
+        );
         static::assertTrue($result);
     }
 }
