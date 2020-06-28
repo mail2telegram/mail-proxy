@@ -31,7 +31,6 @@ class TelegramClient
     public function sendMessage(int $chatId, string $text, string $replyMarkup = ''): bool
     {
         if (mb_strlen($text) >= static::MAX_TEXT_LENGTH) {
-            // @todo добавить $replyMarkup к последнему сообщению
             $chanks = static::explodeText($text);
             $length = count($chanks);
             foreach ($chanks as $index => $textChank) {
