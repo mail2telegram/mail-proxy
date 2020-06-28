@@ -1,7 +1,6 @@
 <?php
 
-/** @noinspection PhpIllegalPsrClassPathInspection */
-/** @noinspection PhpUnhandledExceptionInspection */
+/** @noinspection PhpIllegalPsrClassPathInspection PhpUnhandledExceptionInspection */
 
 use Codeception\Test\Unit;
 use M2T\AccountIterator;
@@ -20,7 +19,7 @@ class AccountIteratorTest extends Unit
         new App();
     }
 
-    public function testBase()
+    public function testBase(): void
     {
         /** @var AccountIterator $accounter */
         $accounter = App::get(AccountIterator::class);

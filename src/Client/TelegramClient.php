@@ -33,8 +33,9 @@ class TelegramClient
         if (mb_strlen($text) >= static::MAX_TEXT_LENGTH) {
             // @todo добавить $replyMarkup к последнему сообщению
             $chanks = static::explodeText($text);
-            foreach ($chanks as $t) {
-                $result = $this->sendMessage($chatId, $t);
+            $length = count($chanks);
+            foreach ($chanks as $index => $textChank) {
+                $result = $this->sendMessage($chatId, $textChank, $index === $length - 1 ? $replyMarkup : '');
                 if (!$result) {
                     return false;
                 }
