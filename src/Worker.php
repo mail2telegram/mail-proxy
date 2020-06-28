@@ -68,10 +68,10 @@ final class Worker
 
     private function task(): void
     {
-        $this->logger->info('Worker task started');
+        $this->logger->debug('Worker task started');
         $account = $this->accounter->get();
         if (!$account) {
-            $this->logger->info('Worker no tasks');
+            $this->logger->debug('Worker no tasks');
             return;
         }
         foreach ($account->emails as $email) {
@@ -81,7 +81,7 @@ final class Worker
             }
             $mailsIds = $this->imap->getMails($mailbox);
             foreach ($mailsIds as $id) {
-                $mail = $mailbox->getMail($id);
+                $mail = $mailbox->getMail($id, false);
                 $this->telegram->sendMessage(
                     $account->chatId,
                     $this->telegram->formatMail($mail),
@@ -101,7 +101,7 @@ final class Worker
                 }
             }
         }
-        $this->logger->info('Worker task finished');
+        $this->logger->debug('Worker task finished');
     }
 
     // @todo dratf

@@ -6,14 +6,17 @@ use M2T\Model\Email;
 use PhpImap\Exceptions\InvalidParameterException;
 use PhpImap\Mailbox;
 use Psr\Log\LoggerInterface;
+use Redis;
 
 class ImapClient
 {
     protected LoggerInterface $logger;
+    protected Redis $redis;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, Redis $redis)
     {
         $this->logger = $logger;
+        $this->redis = $redis;
     }
 
     public function getMailbox(Email $account): ?Mailbox
@@ -31,11 +34,18 @@ class ImapClient
     }
 
     /**
-     * @param \PhpImap\Mailbox $mailbox
+     * @param Mailbox $mailbox
      * @return int[]
      */
     public function getMails(Mailbox $mailbox): array
     {
-        return $mailbox->searchMailbox('UNSEEN');
+        $key = base64_encode($mailbox->getLogin());
+        $lastId = $this->redis->get('mailLastId:' . $key) ?: 0;
+        $ids = $mailbox->searchMailbox('SINCE ' .  date('d-M-Y', strtotime('-1 days')));
+        $ids = array_filter($ids, fn($id) => $id > $lastId);
+        if ($ids) {
+            $this->redis->set('mailLastId:' . $key, max($ids));
+        }
+        return $ids;
     }
 }
