@@ -10,7 +10,7 @@ use Throwable;
 final class Worker
 {
     private LoggerInterface $logger;
-    private StorageInterface $storage;
+    private AccountIterator $accounter;
     private ImapClient $imap;
     private TelegramClient $telegram;
     private int $memoryLimit;
@@ -18,12 +18,12 @@ final class Worker
 
     public function __construct(
         LoggerInterface $logger,
-        StorageInterface $storage,
+        AccountIterator $accounter,
         ImapClient $imap,
         TelegramClient $telegram
     ) {
         $this->logger = $logger;
-        $this->storage = $storage;
+        $this->accounter = $accounter;
         $this->imap = $imap;
         $this->telegram = $telegram;
         $this->interval = App::get('workerInterval');
@@ -58,9 +58,7 @@ final class Worker
             }
             usleep($this->interval);
             try {
-                $this->logger->info('Worker task started');
                 $this->task();
-                $this->logger->info('Worker task finished');
             } catch (Throwable $e) {
                 $this->logger->error((string) $e);
             }
@@ -70,7 +68,12 @@ final class Worker
 
     private function task(): void
     {
-        $account = $this->storage->getAccount();
+        $this->logger->info('Worker task started');
+        $account = $this->accounter->get();
+        if (!$account) {
+            $this->logger->info('Worker no tasks');
+            return;
+        }
         foreach ($account->emails as $email) {
             $mailbox = $this->imap->getMailbox($email);
             if (!$mailbox) {
@@ -98,6 +101,7 @@ final class Worker
                 }
             }
         }
+        $this->logger->info('Worker task finished');
     }
 
     // @todo dratf
