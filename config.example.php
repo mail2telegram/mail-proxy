@@ -9,6 +9,7 @@ use Psr\Log\LoggerInterface;
 return [
     'workerMemoryLimit' => 134_217_728, // 128MB
     'workerInterval' => 1_000_000, // micro seconds
+    'workerLockTTL' => 30, // seconds
     'telegramToken' => 'XXX',
     'testChatId' => 123456,
     'testEmailPwd' => 'XXX',

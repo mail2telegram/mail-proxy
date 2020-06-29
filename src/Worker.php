@@ -5,29 +5,35 @@ namespace M2T;
 use M2T\Client\ImapClient;
 use M2T\Client\TelegramClient;
 use Psr\Log\LoggerInterface;
+use Redis;
 use Throwable;
 
 final class Worker
 {
     private LoggerInterface $logger;
+    private Redis $redis;
     private AccountIterator $accounter;
     private ImapClient $imap;
     private TelegramClient $telegram;
     private int $memoryLimit;
     private int $interval;
+    private int $lockTTL;
 
     public function __construct(
         LoggerInterface $logger,
+        Redis $redis,
         AccountIterator $accounter,
         ImapClient $imap,
         TelegramClient $telegram
     ) {
         $this->logger = $logger;
+        $this->redis = $redis;
         $this->accounter = $accounter;
         $this->imap = $imap;
         $this->telegram = $telegram;
-        $this->interval = App::get('workerInterval');
         $this->memoryLimit = App::get('workerMemoryLimit');
+        $this->interval = App::get('workerInterval');
+        $this->lockTTL = App::get('workerLockTTL');
 
         $this->logger->info('Worker started');
         pcntl_signal(SIGTERM, [$this, 'signalHandler']);
@@ -74,6 +80,14 @@ final class Worker
             $this->logger->debug('Worker no tasks');
             return;
         }
+
+        $key = 'lock:imap:' . $account->chatId;
+        if (!$this->redis->setNx($key, true)) {
+            $this->logger->debug('Worker task locked');
+            return;
+        }
+        $this->redis->expire($key, $this->lockTTL);
+
         foreach ($account->emails as $email) {
             $mailbox = $this->imap->getMailbox($email);
             if (!$mailbox) {
@@ -101,6 +115,8 @@ final class Worker
                 }
             }
         }
+
+        $this->redis->del($key);
         $this->logger->debug('Worker task finished');
     }
 
