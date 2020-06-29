@@ -32,6 +32,26 @@ class Base extends Module
                     465,
                     'ssl'
                 ),
+                new Email(
+                    'mail2telegram.app@yandex.ru',
+                    $pwd,
+                    'imap.yandex.com',
+                    993,
+                    'ssl',
+                    'smtp.yandex.com',
+                    465,
+                    'ssl'
+                ),
+                new Email(
+                    'mail2telegram.app@mail.ru',
+                    $pwd,
+                    'imap.mail.ru',
+                    993,
+                    'ssl',
+                    'smtp.mail.ru',
+                    465,
+                    'ssl'
+                ),
             ]
         );
     }

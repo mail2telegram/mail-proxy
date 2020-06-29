@@ -26,5 +26,6 @@ class AccountIteratorBaseTest extends Unit
         $manager->save($this->tester->accountProvider());
         $result = $accounter->get();
         static::assertInstanceOf(Account::class, $result);
+        static::assertInstanceOf(Account::class, $result);
     }
 }

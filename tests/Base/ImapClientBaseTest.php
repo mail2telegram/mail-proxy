@@ -18,12 +18,13 @@ class ImapClientBaseTest extends Unit
     {
         /** @var ImapClient $client */
         $client = App::get(ImapClient::class);
-        $email = $this->tester->accountProvider()->emails[0];
 
-        $mailbox = $client->getMailbox($email);
-        static::assertInstanceOf(Mailbox::class, $mailbox);
+        foreach ($this->tester->accountProvider()->emails as $email) {
+            $mailbox = $client->getMailbox($email);
+            static::assertInstanceOf(Mailbox::class, $mailbox);
 
-        $result = $client->getMails($mailbox);
-        static::assertIsArray($result);
+            $result = $client->getMails($mailbox);
+            static::assertIsArray($result);
+        }
     }
 }
