@@ -22,7 +22,7 @@ class TelegramClient
         $this->logger = $logger;
         $this->client = new Client(
             [
-                'base_uri' => static::BASE_URL . (getenv('TELEGRAM_TOKEN') ?: App::get('TELEGRAM_TOKEN')) . '/',
+                'base_uri' => static::BASE_URL . (getenv('TELEGRAM_TOKEN') ?: App::get('telegramToken')) . '/',
                 'timeout' => 5.0,
             ]
         );

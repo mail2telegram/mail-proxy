@@ -9,9 +9,9 @@ use Psr\Log\LoggerInterface;
 return [
     'workerMemoryLimit' => 134_217_728, // 128MB
     'workerInterval' => 1_000_000, // micro seconds
-    'TELEGRAM_TOKEN' => 'XXX',
-    'TEST_CHAT_ID' => 123456,
-    'TEST_EMAIL_PWD' => 'XXX',
+    'telegramToken' => 'XXX',
+    'testChatId' => 123456,
+    'testEmailPwd' => 'XXX',
     'redis' => [
         'host' => 'm2t_redis',
     ],

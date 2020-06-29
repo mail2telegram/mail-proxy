@@ -32,7 +32,7 @@ class Unit extends Module
 
     public function accountProvider(): Account
     {
-        $pwd = getenv('TEST_EMAIL_PWD') ?: (require './config.php')['TEST_EMAIL_PWD'];
+        $pwd = getenv('TEST_EMAIL_PWD') ?: (require './config.php')['testEmailPwd'];
         return new Account(
             123456,
             [

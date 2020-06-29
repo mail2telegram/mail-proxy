@@ -18,7 +18,7 @@ class TelegramClientTest extends Unit
     public function __construct()
     {
         parent::__construct();
-        $this->chatId = getenv('TEST_CHAT_ID') ?: App::get('TEST_CHAT_ID');
+        $this->chatId = getenv('TEST_CHAT_ID') ?: App::get('testChatId');
         $this->client = App::get(TelegramClient::class);
     }
 
