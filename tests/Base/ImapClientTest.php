@@ -9,17 +9,17 @@ use Codeception\Test\Unit;
 use M2T\App;
 use M2T\Client\ImapClient;
 use PhpImap\Mailbox;
+use Psr\Log\LoggerInterface;
 
-class ImapClientBaseTest extends Unit
+class ImapClientTest extends Unit
 {
     protected BaseTester $tester;
 
     public function testGetMails(): void
     {
-        /** @var ImapClient $client */
-        $client = App::get(ImapClient::class);
+        $client = new ImapClient(App::get(LoggerInterface::class));
 
-        foreach ($this->tester->accountProvider()->emails as $email) {
+        foreach ($this->tester->accountProvider()[0]->emails as $email) {
             $mailbox = $client->getMailbox($email);
             static::assertInstanceOf(Mailbox::class, $mailbox);
 

@@ -2,8 +2,9 @@
 
 namespace M2T\Client;
 
-use M2T\App;
 use GuzzleHttp\Client;
+use GuzzleHttp\ClientInterface;
+use M2T\App;
 use PhpImap\IncomingMail;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -15,17 +16,18 @@ class TelegramClient
     protected const MAX_FILE_SIZE = 10_485_760; // 10 MB
 
     protected LoggerInterface $logger;
-    protected Client $client;
+    protected ClientInterface $client;
 
-    public function __construct(LoggerInterface $logger)
+    public function __construct(LoggerInterface $logger, ?ClientInterface $client = null)
     {
         $this->logger = $logger;
-        $this->client = new Client(
-            [
-                'base_uri' => static::BASE_URL . (getenv('TELEGRAM_TOKEN') ?: App::get('telegramToken')) . '/',
-                'timeout' => 5.0,
-            ]
-        );
+        $this->client = $client
+            ?? new Client(
+                [
+                    'base_uri' => static::BASE_URL . (getenv('TELEGRAM_TOKEN') ?: App::get('telegramToken')) . '/',
+                    'timeout' => App::get('telegramTimeout'),
+                ]
+            );
     }
 
     public function sendMessage(int $chatId, string $text, string $replyMarkup = ''): bool

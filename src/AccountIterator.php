@@ -2,8 +2,8 @@
 
 namespace M2T;
 
-use M2T\Model\Account;
 use ArrayIterator;
+use M2T\Model\Account;
 
 class AccountIterator
 {

@@ -3,20 +3,17 @@
 namespace M2T\Client;
 
 use M2T\Model\Email;
-use PhpImap\Exceptions\InvalidParameterException;
 use PhpImap\Mailbox;
 use Psr\Log\LoggerInterface;
-use Redis;
+use Throwable;
 
 class ImapClient
 {
     protected LoggerInterface $logger;
-    protected Redis $redis;
 
-    public function __construct(LoggerInterface $logger, Redis $redis)
+    public function __construct(LoggerInterface $logger)
     {
         $this->logger = $logger;
-        $this->redis = $redis;
     }
 
     public function getMailbox(Email $account): ?Mailbox
@@ -27,7 +24,7 @@ class ImapClient
                 $account->email,
                 $account->pwd
             );
-        } catch (InvalidParameterException $e) {
+        } catch (Throwable $e) {
             $this->logger->error((string) $e);
         }
         return null;
@@ -39,13 +36,6 @@ class ImapClient
      */
     public function getMails(Mailbox $mailbox): array
     {
-        $key = base64_encode($mailbox->getLogin());
-        $lastId = $this->redis->get('mailLastId:' . $key) ?: 0;
-        $ids = $mailbox->searchMailbox('SINCE ' .  date('d-M-Y', strtotime('-1 days')));
-        $ids = array_filter($ids, fn($id) => $id > $lastId);
-        if ($ids) {
-            $this->redis->set('mailLastId:' . $key, max($ids));
-        }
-        return $ids;
+        return $mailbox->searchMailbox('SINCE ' . date('d-M-Y', strtotime('-1 days')));
     }
 }

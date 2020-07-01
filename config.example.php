@@ -11,6 +11,7 @@ return [
     'workerInterval' => 1_000_000, // micro seconds
     'workerLockTTL' => 30, // seconds
     'telegramToken' => 'XXX',
+    'telegramTimeout' => 5.0,
     'testChatId' => 123456,
     'testEmailPwd' => 'XXX',
     'redis' => [

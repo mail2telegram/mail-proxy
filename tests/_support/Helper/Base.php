@@ -16,43 +16,52 @@ class Base extends Module
         new App();
     }
 
-    public function accountProvider(): Account
+    /**
+     * @return \M2T\Model\Account[]
+     */
+    public function accountProvider(): array
     {
         $pwd = getenv('TEST_EMAIL_PWD') ?: (require './config.php')['testEmailPwd'];
-        return new Account(
-            123456,
-            [
-                new Email(
-                    'mail2telegram.app@gmail.com',
-                    $pwd,
-                    'imap.gmail.com',
-                    993,
-                    'ssl',
-                    'smtp.gmail.com',
-                    465,
-                    'ssl'
-                ),
-                new Email(
-                    'mail2telegram.app@yandex.ru',
-                    $pwd,
-                    'imap.yandex.com',
-                    993,
-                    'ssl',
-                    'smtp.yandex.com',
-                    465,
-                    'ssl'
-                ),
-                new Email(
-                    'mail2telegram.app@mail.ru',
-                    $pwd,
-                    'imap.mail.ru',
-                    993,
-                    'ssl',
-                    'smtp.mail.ru',
-                    465,
-                    'ssl'
-                ),
-            ]
-        );
+        return [
+            new Account(
+                123456,
+                [
+                    new Email(
+                        'mail2telegram.app@gmail.com',
+                        $pwd,
+                        'imap.gmail.com',
+                        993,
+                        'ssl',
+                        'smtp.gmail.com',
+                        465,
+                        'ssl'
+                    ),
+                    new Email(
+                        'mail2telegram.app@yandex.ru',
+                        $pwd,
+                        'imap.yandex.com',
+                        993,
+                        'ssl',
+                        'smtp.yandex.com',
+                        465,
+                        'ssl'
+                    ),
+                    new Email(
+                        'mail2telegram.app@mail.ru',
+                        $pwd,
+                        'imap.mail.ru',
+                        993,
+                        'ssl',
+                        'smtp.mail.ru',
+                        465,
+                        'ssl'
+                    ),
+                ]
+            ),
+            new Account(
+                123,
+                []
+            ),
+        ];
     }
 }

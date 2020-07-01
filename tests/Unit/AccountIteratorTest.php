@@ -4,12 +4,10 @@
 
 namespace Unit;
 
-use UnitTester;
 use Codeception\Test\Unit;
 use M2T\AccountIterator;
 use M2T\AccountManager;
-use M2T\App;
-use M2T\Model\Account;
+use UnitTester;
 
 class AccountIteratorTest extends Unit
 {
@@ -17,14 +15,23 @@ class AccountIteratorTest extends Unit
 
     public function testBase(): void
     {
-        /** @var AccountIterator $accounter */
-        $accounter = App::get(AccountIterator::class);
+        [$account0, $account1] = $this->tester->accountProvider();
+        $account = &$account0;
 
-        /** @var AccountManager $manager */
-        $manager = App::get(AccountManager::class);
+        $manager = $this->createStub(AccountManager::class);
+        $manager->method('getChats')->willReturn([$account0->chatId, $account1->chatId]);
+        $manager->method('load')->willReturn($account0, $account1, $account0);
+        $accounter = new AccountIterator($manager);
 
-        $manager->save($this->tester->accountProvider());
         $result = $accounter->get();
-        static::assertInstanceOf(Account::class, $result);
+        static::assertSame($account->chatId, $result->chatId);
+
+        $account = &$account1;
+        $result = $accounter->get();
+        static::assertSame($account->chatId, $result->chatId);
+
+        $account = &$account0;
+        $result = $accounter->get();
+        static::assertSame($account->chatId, $result->chatId);
     }
 }

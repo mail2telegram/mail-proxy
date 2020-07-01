@@ -2,30 +2,31 @@
 
 /** @noinspection PhpUnhandledExceptionInspection */
 
-namespace Unit;
+namespace Base;
 
-use UnitTester;
+use BaseTester;
 use Codeception\Test\Unit;
 use M2T\App;
 use M2T\Client\TelegramClient;
+use Psr\Log\LoggerInterface;
 
 class TelegramClientTest extends Unit
 {
-    protected UnitTester $tester;
+    protected BaseTester $tester;
     protected int $chatId;
     protected TelegramClient $client;
 
     public function __construct()
     {
         parent::__construct();
+        $this->client = new TelegramClient(App::get(LoggerInterface::class));
         $this->chatId = getenv('TEST_CHAT_ID') ?: App::get('testChatId');
-        $this->client = App::get(TelegramClient::class);
     }
 
-    public function testSendMessage(): void
+    protected static function getMarkup()
     {
         /** @noinspection JsonEncodingApiUsageInspection */
-        $markup = json_encode(
+        return json_encode(
             [
                 'inline_keyboard' => [
                     [
@@ -37,26 +38,21 @@ class TelegramClientTest extends Unit
                 ],
             ]
         );
-        $result = $this->client->sendMessage($this->chatId, 'test', $markup);
+    }
+
+    public function testSendMessage(): void
+    {
+        $result = $this->client->sendMessage($this->chatId, 'test', static::getMarkup());
         static::assertTrue($result);
     }
 
     public function testSendMessageLong(): void
     {
-        /** @noinspection JsonEncodingApiUsageInspection */
-        $markup = json_encode(
-            [
-                'inline_keyboard' => [
-                    [
-                        [
-                            'text' => 'Reply',
-                            'callback_data' => 'Reply',
-                        ],
-                    ],
-                ],
-            ]
+        $result = $this->client->sendMessage(
+            $this->chatId,
+            str_repeat('Тестовое сообщение ', 250),
+            static::getMarkup()
         );
-        $result = $this->client->sendMessage($this->chatId, str_repeat('Тестовое сообщение ', 250), $markup);
         static::assertTrue($result);
     }
 
