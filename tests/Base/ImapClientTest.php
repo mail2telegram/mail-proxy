@@ -18,11 +18,9 @@ class ImapClientTest extends Unit
     public function testGetMails(): void
     {
         $client = new ImapClient(App::get(LoggerInterface::class));
-
-        foreach ($this->tester->accountProvider()[0]->emails as $email) {
+        foreach ($this->tester->emailProvider() as $email) {
             $mailbox = $client->getMailbox($email);
             static::assertInstanceOf(Mailbox::class, $mailbox);
-
             $result = $client->getMails($mailbox);
             static::assertIsArray($result);
         }
