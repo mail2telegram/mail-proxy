@@ -58,10 +58,7 @@ class Base extends Module
                     ),
                 ]
             ),
-            new Account(
-                123,
-                []
-            ),
+            new Account(123, []),
         ];
     }
 }
