@@ -106,7 +106,7 @@ final class Worker
             return;
         }
 
-        $key = 'lock:imap:' . $account->chatId;
+        $key = 'mailProxyLock:' . $account->chatId;
         if (!$this->redis->setNx($key, true)) {
             $this->logger->debug('Worker task locked');
             return;
@@ -133,14 +133,14 @@ final class Worker
             return;
         }
 
-        $key = base64_encode($mailbox->getLogin());
-        $lastId = $this->redis->get('mailLastId:' . $key) ?: 0;
+        $key = 'lastMailId:' . $account->chatId . ':' . $mailbox->getLogin();
+        $lastId = $this->redis->get($key) ?: 0;
         $mailsIds = array_filter($mailsIds, fn($id) => $id > $lastId);
         if (!$mailsIds) {
             return;
         }
 
-        $this->redis->set('mailLastId:' . $key, max($mailsIds));
+        $this->redis->set($key, max($mailsIds));
         foreach ($mailsIds as $id) {
             $mail = $mailbox->getMail($id, false);
             $this->telegram->sendMessage(
@@ -163,7 +163,7 @@ final class Worker
         }
     }
 
-    // @todo dratf
+    // @todo draft
     private function getReplyMarkup(int $mailId): string
     {
         /** @noinspection JsonEncodingApiUsageInspection */
