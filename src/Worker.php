@@ -8,6 +8,7 @@ use M2T\Model\Account;
 use M2T\Model\Email;
 use Psr\Log\LoggerInterface;
 use Redis;
+use RedisException;
 use Throwable;
 
 final class Worker
@@ -69,9 +70,31 @@ final class Worker
                 $this->task();
             } catch (Throwable $e) {
                 $this->logger->error((string) $e);
+                if (is_a($e, RedisException::class)) {
+                    $this->reconnectRedis();
+                }
             }
         }
         $this->logger->info('Worker finished');
+    }
+
+    /** @SuppressWarnings(PHPMD.EmptyCatchBlock) */
+    private function reconnectRedis(): void
+    {
+        $config = App::get('redis');
+        usleep(App::get('workerReconnectInterval'));
+        try {
+            /** @phan-suppress-next-line PhanParamTooManyInternal */
+            $this->redis->pconnect(
+                $config['host'],
+                $config['port'] ?? 6379,
+                $config['timeout'] ?? 0.0,
+                $config['persistentId'] ?? null,
+                $config['retryInterval'] ?? 0,
+                $config['readTimeout'] ?? 0.0
+            );
+        } catch (Throwable $e) {
+        }
     }
 
     private function task(): void
