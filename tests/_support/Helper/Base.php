@@ -4,7 +4,6 @@ namespace Helper;
 
 use Codeception\Module;
 use M2T\App;
-use M2T\Model\Account;
 use M2T\Model\Email;
 
 class Base extends Module
@@ -17,7 +16,7 @@ class Base extends Module
     }
 
     /**
-     * @return array|\M2T\Model\Email[]
+     * @return \M2T\Model\Email[]
      */
     public function emailProvider(): array
     {
