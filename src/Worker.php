@@ -146,7 +146,7 @@ final class Worker
             $this->telegram->sendMessage(
                 $account->chatId,
                 $this->telegram->formatMail($mail),
-                $this->getReplyMarkup()
+                $this->getReplyMarkup($id)
             );
             $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
             if ($mail->hasAttachments()) {
@@ -164,7 +164,7 @@ final class Worker
     }
 
     // @todo dratf
-    private function getReplyMarkup(): string
+    private function getReplyMarkup(int $mailId): string
     {
         /** @noinspection JsonEncodingApiUsageInspection */
         return json_encode(
@@ -176,8 +176,8 @@ final class Worker
                             'callback_data' => 'Reply',
                         ],
                         [
-                            'text' => 'Archive',
-                            'callback_data' => 'Archive',
+                            'text' => 'Delete',
+                            'callback_data' => 'delete:' . $mailId,
                         ],
                     ],
                 ],
