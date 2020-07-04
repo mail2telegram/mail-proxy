@@ -16,7 +16,7 @@ return [
         LoggerInterface::class,
     ],
     LoggerInterface::class => static function () {
-        $stream = new StreamHandler(STDERR);
+        $stream = new StreamHandler(STDERR, App::get('logLevel'));
         $stream->setFormatter(new CliFormatter());
         return (new Logger('app'))->pushHandler($stream);
     },
@@ -41,3 +41,5 @@ return [
         return $connect;
     },
 ];
+
+
