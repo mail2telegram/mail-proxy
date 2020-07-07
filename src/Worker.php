@@ -113,27 +113,27 @@ final class Worker
         }
         $this->redis->expire($key, $this->lockTTL);
 
-        foreach ($account->emails as $email) {
-            $this->processMailbox($account, $email);
+        foreach ($account->emails as $mailbox) {
+            $this->processMailbox($account, $mailbox);
         }
 
         $this->redis->del($key);
         $this->logger->debug('Worker task finished');
     }
 
-    private function processMailbox(Account $account, Email $email): void
+    private function processMailbox(Account $account, Email $mailbox): void
     {
-        $mailbox = $this->imap->getMailbox($email);
-        if (!$mailbox) {
+        $imapMailbox = $this->imap->getMailbox($mailbox);
+        if (!$imapMailbox) {
             return;
         }
 
-        $mailsIds = $this->imap->getMails($mailbox);
+        $mailsIds = $this->imap->getMails($imapMailbox);
         if (!$mailsIds) {
             return;
         }
 
-        $key = 'lastMailId:' . $account->chatId . ':' . $mailbox->getLogin();
+        $key = 'lastMailId:' . $account->chatId . ':' . $imapMailbox->getLogin();
         $lastId = $this->redis->get($key) ?: 0;
         $mailsIds = array_filter($mailsIds, fn($id) => $id > $lastId);
         if (!$mailsIds) {
@@ -142,15 +142,15 @@ final class Worker
 
         // т.к. мы запрашиваем почту с предыдущего дня, то больше 2 дней хранить не нужно
         $this->redis->setex($key, 172_800, max($mailsIds));
-        foreach ($mailsIds as $id) {
-            $mail = $mailbox->getMail($id, false);
+        foreach ($mailsIds as $mailId) {
+            $mail = $imapMailbox->getMail($mailId, false);
             $this->telegram->sendMessage(
                 $account->chatId,
-                $this->telegram->formatMail($mail),
-                $this->getReplyMarkup($id)
+                $this->telegram->formatMail($mail, $mailbox->email),
+                $this->getReplyMarkup($mailId)
             );
-            $this->logger->debug('MailId: ' . $id);
-            $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
+            $this->logger->debug('MailId: ' . $mailId);
+            $this->logger->debug('Message: ' . $this->telegram->formatMail($mail, $mailbox->email));
             if ($mail->hasAttachments()) {
                 $attachments = $mail->getAttachments();
                 foreach ($attachments as $attach) {

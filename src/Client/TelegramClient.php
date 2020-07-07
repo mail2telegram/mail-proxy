@@ -182,12 +182,25 @@ class TelegramClient
         return explode($break, $result);
     }
 
-    public function formatMail(IncomingMail $mail): string
+    public function formatMail(IncomingMail $mail, string $to): string
     {
+        $from = $mail->fromName
+            ? "{$mail->fromName} <{$mail->fromAddress}>"
+            : "<{$mail->fromAddress}>";
+
+        // Здесь email, подключенный к сервису, без имени.
+        $to = "<{$to}>";
+        // Если email не совпадает с To из письма (пересылка, группа рассылки, etc) - добавим OriginTo
+        $originTo = '';
+        if ($mail->toString && false === strpos($mail->toString, $to)) {
+            $originTo = $mail->toString;
+        }
+
         return $mail->subject
             . "\n\nDate: {$mail->date}"
-            . "\nTo: {$mail->toString}"
-            . "\nFrom: {$mail->fromName} <{$mail->fromAddress}>"
+            . "\nFrom: $from"
+            . "\nTo: {$to}"
+            . ($originTo ? "\nOriginTo: {$originTo}" : '')
             . "\n\n{$mail->textPlain}";
     }
 }
