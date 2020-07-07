@@ -140,7 +140,8 @@ final class Worker
             return;
         }
 
-        $this->redis->set($key, max($mailsIds));
+        // т.к. мы запрашиваем почту с предыдущего дня, то больше 2 дней хранить не нужно
+        $this->redis->setex($key, 172_800, max($mailsIds));
         foreach ($mailsIds as $id) {
             $mail = $mailbox->getMail($id, false);
             $this->telegram->sendMessage(
@@ -148,6 +149,7 @@ final class Worker
                 $this->telegram->formatMail($mail),
                 $this->getReplyMarkup($id)
             );
+            $this->logger->debug('MailId: ' . $id);
             $this->logger->debug('Message: ' . $this->telegram->formatMail($mail));
             if ($mail->hasAttachments()) {
                 $attachments = $mail->getAttachments();
