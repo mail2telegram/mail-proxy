@@ -174,8 +174,12 @@ final class Worker
                 'inline_keyboard' => [
                     [
                         [
-                            'text' => 'Reply',
-                            'callback_data' => 'Reply',
+                            'text' => 'Seen',
+                            'callback_data' => 'seen:' . $mailId,
+                        ],
+                        [
+                            'text' => 'Spam',
+                            'callback_data' => 'spam:' . $mailId,
                         ],
                         [
                             'text' => 'Delete',
