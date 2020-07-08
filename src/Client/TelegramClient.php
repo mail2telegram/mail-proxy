@@ -188,8 +188,6 @@ class TelegramClient
             ? "{$mail->fromName} <{$mail->fromAddress}>"
             : "<{$mail->fromAddress}>";
 
-        // Здесь email, подключенный к сервису, без имени.
-        $to = "<{$to}>";
         // Если email не совпадает с To из письма (пересылка, группа рассылки, etc) - добавим OriginTo
         $originTo = '';
         if ($mail->toString && false === strpos($mail->toString, $to)) {
@@ -199,7 +197,7 @@ class TelegramClient
         return $mail->subject
             . "\n\nDate: {$mail->date}"
             . "\nFrom: $from"
-            . "\nTo: {$to}"
+            . "\nTo: <{$to}>"
             . ($originTo ? "\nOriginTo: {$originTo}" : '')
             . "\n\n{$mail->textPlain}";
     }
