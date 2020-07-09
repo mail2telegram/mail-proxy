@@ -165,7 +165,6 @@ final class Worker
         }
     }
 
-    // @todo draft
     private function getReplyMarkup(int $mailId): string
     {
         /** @noinspection JsonEncodingApiUsageInspection */
