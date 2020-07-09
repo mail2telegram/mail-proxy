@@ -20,7 +20,7 @@ class Base extends Module
      */
     public function emailProvider(): array
     {
-        $pwd = getenv('TEST_EMAIL_PWD') ?: (require './config.php')['testEmailPwd'];
+        $pwd = (require './config.php')['testEmailPwd'];
         return [
             new Email(
                 'mail2telegram.app@gmail.com',

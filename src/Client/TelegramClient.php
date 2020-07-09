@@ -24,7 +24,7 @@ class TelegramClient
         $this->client = $client
             ?? new Client(
                 [
-                    'base_uri' => static::BASE_URL . (getenv('TELEGRAM_TOKEN') ?: App::get('telegramToken')) . '/',
+                    'base_uri' => static::BASE_URL . App::get('telegramToken') . '/',
                     'timeout' => App::get('telegramTimeout'),
                 ]
             );

@@ -22,7 +22,7 @@ class ImapClient
             return new Mailbox(
                 "{{$account->imapHost}:{$account->imapPort}/imap/{$account->imapSocketType}}INBOX",
                 $account->email,
-                $account->pwd
+                $account->getPwd()
             );
         } catch (Throwable $e) {
             $this->logger->error((string) $e);

@@ -1,7 +1,9 @@
 <?php
 
+use M2T\Interfaces\ICrypto;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
+use Mqwerty\Crypto;
 use pahanini\Monolog\Formatter\CliFormatter;
 use Psr\Log\LoggerInterface;
 
@@ -13,7 +15,9 @@ return [
     'telegramTimeout' => 5.0,
     'shared' => [
         LoggerInterface::class,
+        ICrypto::class,
     ],
+    ICrypto::class => fn($c) => new Crypto(($c->get('cryptoKey'))),
     LoggerInterface::class => static function ($c) {
         $stream = new StreamHandler(STDERR, $c->get('logLevel'));
         $stream->setFormatter(new CliFormatter());
@@ -40,5 +44,3 @@ return [
         return $connect;
     },
 ];
-
-

@@ -20,7 +20,7 @@ class TelegramClientTest extends Unit
     {
         parent::__construct();
         $this->client = new TelegramClient(App::get(LoggerInterface::class));
-        $this->chatId = getenv('TEST_CHAT_ID') ?: App::get('testChatId');
+        $this->chatId = App::get('testChatId');
     }
 
     protected static function getMarkup()
