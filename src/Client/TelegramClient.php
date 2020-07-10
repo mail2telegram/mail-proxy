@@ -187,18 +187,13 @@ class TelegramClient
         $from = $mail->fromName
             ? "{$mail->fromName} <{$mail->fromAddress}>"
             : "<{$mail->fromAddress}>";
-
-        // Если email не совпадает с To из письма (пересылка, группа рассылки, etc) - добавим OriginTo
-        $originTo = '';
-        if ($mail->toString && false === strpos($mail->toString, $to)) {
-            $originTo = $mail->toString;
-        }
-
+        $replyTo = array_keys($mail->replyTo)[0] ?? $mail->fromAddress;
         return $mail->subject
             . "\n\nDate: {$mail->date}"
-            . "\nFrom: $from"
-            . "\nTo: <{$to}>"
-            . ($originTo ? "\nOriginTo: {$originTo}" : '')
+            . "\nFrom: {$from}"
+            . "\nReplyTo: <{$replyTo}>"
+            . "\nTo: {$mail->toString}"
+            . "\nEmail: <{$to}>"
             . "\n\n{$mail->textPlain}";
     }
 }

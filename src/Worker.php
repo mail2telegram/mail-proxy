@@ -147,7 +147,7 @@ final class Worker
             $this->telegram->sendMessage(
                 $account->chatId,
                 $this->telegram->formatMail($mail, $mailbox->email),
-                $this->getReplyMarkup($mailId)
+                $this->getReplyMarkup($mailId, $mailbox)
             );
             $this->logger->debug('MailId: ' . $mailId);
             $this->logger->debug('Message: ' . $this->telegram->formatMail($mail, $mailbox->email));
@@ -165,7 +165,7 @@ final class Worker
         }
     }
 
-    private function getReplyMarkup(int $mailId): string
+    private function getReplyMarkup(int $mailId, Email $mailbox): string
     {
         /** @noinspection JsonEncodingApiUsageInspection */
         return json_encode(
@@ -173,20 +173,35 @@ final class Worker
                 'inline_keyboard' => [
                     [
                         [
-                            'text' => 'Seen',
-                            'callback_data' => 'seen:' . $mailId,
+                            'text' => 'Reply',
+                            'callback_data' => $this->getCallbackData('re', $mailId, $mailbox),
+                        ],
+                        [
+                            'text' => 'Reply all',
+                            'callback_data' => $this->getCallbackData('reall', $mailId, $mailbox),
+                        ],
+                    ],
+                    [
+                        [
+                            'text' => 'Mark as read',
+                            'callback_data' => $this->getCallbackData('seen', $mailId, $mailbox),
                         ],
                         [
                             'text' => 'Spam',
-                            'callback_data' => 'spam:' . $mailId,
+                            'callback_data' => $this->getCallbackData('spam', $mailId, $mailbox),
                         ],
                         [
                             'text' => 'Delete',
-                            'callback_data' => 'delete:' . $mailId,
+                            'callback_data' => $this->getCallbackData('delete', $mailId, $mailbox),
                         ],
                     ],
                 ],
             ]
         );
+    }
+
+    private function getCallbackData(string $action, int $mailId, Email $mailbox): string
+    {
+        return $action . ':' . $mailId . ':' . md5($mailbox->email);
     }
 }
