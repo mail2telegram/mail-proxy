@@ -5,7 +5,7 @@ on:
       - master
   pull_request:
 env:
-  TELEGRAM_TOKEN: ${{ secrets.TEST_TELEGRAM_TOKEN }}
+  TEST_TELEGRAM_TOKEN: ${{ secrets.TEST_TELEGRAM_TOKEN }}
   TEST_CHAT_ID: ${{ secrets.TEST_CHAT_ID }}
   TEST_EMAIL_PWD: ${{ secrets.TEST_EMAIL_PWD }}
   IMAGE_ID: docker.io/mail2telegram/mail-proxy

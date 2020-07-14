@@ -3,7 +3,7 @@
 return [
     'cryptoKey' => 'XXX',
     'logLevel' => 'debug',
-    'telegramToken' => getenv('TELEGRAM_TOKEN') ?: 'XXX',
+    'telegramToken' => getenv('TEST_TELEGRAM_TOKEN') ?: 'XXX',
     'redis' => [
         'host' => 'm2t_redis',
     ],
