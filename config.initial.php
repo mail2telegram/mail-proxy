@@ -17,7 +17,7 @@ return [
         LoggerInterface::class,
         ICrypto::class,
     ],
-    ICrypto::class => fn($c) => new Crypto(($c->get('cryptoKey'))),
+    ICrypto::class => fn($c) => new Crypto($c->get('cryptoKey')),
     LoggerInterface::class => static function ($c) {
         $stream = new StreamHandler(STDERR, $c->get('logLevel'));
         $stream->setFormatter(new CliFormatter());
