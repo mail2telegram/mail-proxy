@@ -15,14 +15,23 @@ class ImapClientTest extends Unit
 {
     protected BaseTester $tester;
 
-    public function testGetMails(): void
+    public function providerMail(): array
+    {
+        /** @noinspection PhpIncludeInspection */
+        return require codecept_data_dir('/mailAccountList.php');
+    }
+
+    /**
+     * @dataProvider providerMail
+     * @param $mailAccount
+     * @param $expected
+     */
+    public function testGetMails(\M2T\Model\Mailbox $mailAccount, bool $expected): void
     {
         $client = new ImapClient(App::get(LoggerInterface::class));
-        foreach ($this->tester->emailProvider() as $email) {
-            $mailbox = $client->getMailbox($email);
-            static::assertInstanceOf(Mailbox::class, $mailbox);
-            $result = $client->getMails($mailbox);
-            static::assertIsArray($result);
-        }
+        $mailbox = $client->getMailbox($mailAccount);
+        static::assertInstanceOf(Mailbox::class, $mailbox);
+        $result = $client->getMails($mailbox);
+        static::assertIsArray($result);
     }
 }
