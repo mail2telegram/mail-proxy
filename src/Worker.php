@@ -5,7 +5,7 @@ namespace M2T;
 use M2T\Client\ImapClient;
 use M2T\Client\TelegramClient;
 use M2T\Model\Account;
-use M2T\Model\Email;
+use M2T\Model\Mailbox;
 use Psr\Log\LoggerInterface;
 use Redis;
 use RedisException;
@@ -121,7 +121,7 @@ final class Worker
         $this->logger->debug('Worker task finished');
     }
 
-    private function processMailbox(Account $account, Email $mailbox): void
+    private function processMailbox(Account $account, Mailbox $mailbox): void
     {
         $imapMailbox = $this->imap->getMailbox($mailbox);
         if (!$imapMailbox) {
@@ -165,7 +165,7 @@ final class Worker
         }
     }
 
-    private function getReplyMarkup(int $mailId, Email $mailbox): string
+    private function getReplyMarkup(int $mailId, Mailbox $mailbox): string
     {
         /** @noinspection JsonEncodingApiUsageInspection */
         return json_encode(
@@ -200,7 +200,7 @@ final class Worker
         );
     }
 
-    private function getCallbackData(string $action, int $mailId, Email $mailbox): string
+    private function getCallbackData(string $action, int $mailId, Mailbox $mailbox): string
     {
         return $action . ':' . $mailId . ':' . md5($mailbox->email);
     }

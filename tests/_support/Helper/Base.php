@@ -4,7 +4,7 @@ namespace Helper;
 
 use Codeception\Module;
 use M2T\App;
-use M2T\Model\Email;
+use M2T\Model\Mailbox;
 
 class Base extends Module
 {
@@ -16,13 +16,13 @@ class Base extends Module
     }
 
     /**
-     * @return \M2T\Model\Email[]
+     * @return Mailbox[]
      */
     public function emailProvider(): array
     {
         $pwd = (require './config.php')['testEmailPwd'];
         return [
-            new Email(
+            new Mailbox(
                 'mail2telegram.app@gmail.com',
                 $pwd,
                 'imap.gmail.com',
@@ -32,7 +32,7 @@ class Base extends Module
                 465,
                 'ssl'
             ),
-            new Email(
+            new Mailbox(
                 'mail2telegram.app@yandex.ru',
                 $pwd,
                 'imap.yandex.com',
@@ -42,7 +42,7 @@ class Base extends Module
                 465,
                 'ssl'
             ),
-            new Email(
+            new Mailbox(
                 'mail2telegram.app@mail.ru',
                 $pwd,
                 'imap.mail.ru',

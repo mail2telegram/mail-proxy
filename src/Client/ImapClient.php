@@ -2,7 +2,7 @@
 
 namespace M2T\Client;
 
-use M2T\Model\Email;
+use M2T\Model\Mailbox as MailboxAccount;
 use PhpImap\Mailbox;
 use Psr\Log\LoggerInterface;
 use Throwable;
@@ -16,7 +16,7 @@ class ImapClient
         $this->logger = $logger;
     }
 
-    public function getMailbox(Email $account): ?Mailbox
+    public function getMailbox(MailboxAccount $account): ?Mailbox
     {
         try {
             return new Mailbox(
